@@ -32,7 +32,7 @@ from application.event_instance.service import EventInstanceService
 from application.event_type.service import EventTypeService
 from application.preblast import PreblastEventTypeData
 from application.preblast.service import PostMode, PreblastService
-from features import backblast, connect
+from features import backblast, connect, emergency
 from features.calendar import get_preblast_action_blocks
 from features.calendar.preblast_views import PreblastViews
 from infrastructure.api_client import (
@@ -1172,6 +1172,8 @@ def route_preblast_overflow_action(
     elif action_value == actions.NEW_PREBLAST_BUTTON:
         body["actions"][0]["action_id"] = action_value
         preblast_middleware(body, client, logger, context, region_record)
+    elif action_value == actions.EVENT_PREBLAST_EMERGENCY_INFO:
+        emergency.build_emergency_search_form(body, client, logger, context, region_record)
 
 
 # ---------------------------------------------------------------------------

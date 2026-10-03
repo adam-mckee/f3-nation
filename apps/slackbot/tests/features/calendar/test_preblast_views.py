@@ -15,6 +15,7 @@ from features.calendar.event_preblast import (
     build_preblast_info,
     get_preblast_channel,
     handle_event_preblast_edit,
+    route_preblast_overflow_action,
 )
 from features.calendar.preblast_views import PREBLAST_CHANNEL_SELECTOR, PreblastViews
 from utilities import constants
@@ -225,6 +226,29 @@ class PreblastViewsTest(unittest.TestCase):
 
         self.assertNotIn(actions.EVENT_PREBLAST_TAKE_Q, action_ids)
         self.assertNotIn(actions.EVENT_PREBLAST_REMOVE_Q, action_ids)
+
+    def test_preblast_overflow_offers_emergency_info(self):
+        blocks = [block.as_form_field() for block in get_preblast_action_blocks(has_q=True, event_instance_id=42)]
+        overflow_values = [
+            option["value"]
+            for block in blocks
+            for element in block.get("elements", [])
+            if element.get("type") == "overflow"
+            for option in element["options"]
+        ]
+
+        self.assertIn(actions.EVENT_PREBLAST_EMERGENCY_INFO, overflow_values)
+
+    @patch("features.emergency.build_emergency_search_form")
+    def test_emergency_info_overflow_opens_settings_emergency_form(self, build_form):
+        body = {"actions": [{"selected_option": {"value": actions.EVENT_PREBLAST_EMERGENCY_INFO}}]}
+        region_record = SlackSettings(team_id="T1")
+
+        route_preblast_overflow_action(body, MagicMock(), MagicMock(), {}, region_record)
+
+        build_form.assert_called_once()
+        self.assertIs(build_form.call_args.args[0], body)
+        self.assertIs(build_form.call_args.args[4], region_record)
 
     def test_build_preblast_form_shows_remove_q_button_for_q(self):
         event = _event()

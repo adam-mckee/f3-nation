@@ -35,12 +35,14 @@ def get_preblast_action_blocks(has_q: bool = True, event_instance_id: int | None
     overflow_labels = [
         ":pencil: Edit Preblast",
         ":heavy_plus_sign: New Preblast",
+        ":hospital: Emergency Info",
         # orm.ButtonElement(label=":pencil: Edit Preblast", action=actions.EVENT_PREBLAST_EDIT, value="Edit Preblast"),
         # orm.ButtonElement(label=":heavy_plus_sign: New Preblast", action=actions.NEW_PREBLAST_BUTTON),
     ]
     overflow_values = [
         f"{actions.EVENT_PREBLAST_EDIT}_{event_instance_id}",
         actions.NEW_PREBLAST_BUTTON,
+        actions.EVENT_PREBLAST_EMERGENCY_INFO,
     ]
     if event_instance_id:
         overflow_labels.append(":back: Fill Backblast")
